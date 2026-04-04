@@ -62,6 +62,13 @@ Requirements:
 - Maven 3.9+
 - Docker + Docker Compose
 
+## Quick Start
+
+Choose one runtime flow:
+
+1. **Recommended for development:** app on host + PostgreSQL/Redis in Docker
+2. **Containerized app flow:** app + PostgreSQL + Redis all in Docker
+
 Set environment variables (PowerShell):
 
 ```powershell
@@ -89,10 +96,22 @@ Run tests and application:
 .\mvnw.cmd spring-boot:run
 ```
 
+Run full stack in Docker (app + infra):
+
+```powershell
+docker compose up --build app
+```
+
 Stop infrastructure:
 
 ```powershell
 docker compose down
+```
+
+If the cache schema changes between runs, clear Redis once:
+
+```powershell
+docker exec -it mini-ifood-cache redis-cli FLUSHALL
 ```
 
 ## Postman Collection
@@ -100,12 +119,7 @@ docker compose down
 - Collection file: `MiniIfoodAPI.postman_collection.json`
 - Import this file in Postman to test auth and product cache flow
 - Run `Auth -> Login User` first to populate `auth_token`
-
-If cache data gets incompatible after serializer changes:
-
-```powershell
-docker exec -it mini-ifood-cache redis-cli FLUSHALL
-```
+- Then run `Products -> Get All Products (CACHE TEST 1/2)` to see Redis cache behavior
 
 ## Test Strategy
 
