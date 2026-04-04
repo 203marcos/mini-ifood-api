@@ -29,9 +29,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductMapper productMapper;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductMapper productMapper) {
         this.productService = productService;
+        this.productMapper = productMapper;
     }
 
     @GetMapping
@@ -55,7 +57,7 @@ public class ProductController {
         Long id) {
 
         Product product = productService.findById(id);
-        return ResponseEntity.ok(toResponse(product));
+        return ResponseEntity.ok(productMapper.toResponse(product));
     }
 
     @PostMapping
@@ -67,17 +69,12 @@ public class ProductController {
         @Valid
         CreateProductRequest request) {
 
-        Product product = Product.builder()
-            .name(request.name())
-            .description(request.description())
-            .price(request.price())
-            .quantityAvailable(request.quantityAvailable())
-            .build();
+        Product product = productMapper.toEntity(request);
 
         Product created = productService.create(product);
         URI location = URI.create("/api/products/" + created.getId());
 
-        return ResponseEntity.created(location).body(toResponse(created));
+        return ResponseEntity.created(location).body(productMapper.toResponse(created));
     }
 
     @PutMapping("/{id}")
@@ -93,15 +90,10 @@ public class ProductController {
         @Valid
         CreateProductRequest request) {
 
-        Product productData = Product.builder()
-            .name(request.name())
-            .description(request.description())
-            .price(request.price())
-            .quantityAvailable(request.quantityAvailable())
-            .build();
+        Product productData = productMapper.toEntity(request);
 
         Product updated = productService.update(id, productData);
-        return ResponseEntity.ok(toResponse(updated));
+        return ResponseEntity.ok(productMapper.toResponse(updated));
     }
 
     @DeleteMapping("/{id}")
@@ -115,18 +107,6 @@ public class ProductController {
 
         productService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    private ProductResponse toResponse(Product product) {
-        return new ProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.getPrice(),
-            product.getQuantityAvailable(),
-            product.getCreatedAt(),
-            product.getUpdatedAt()
-        );
     }
 
 }

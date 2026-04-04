@@ -2,8 +2,8 @@ package com.marcosdias.miniifood.product.service;
 
 import com.marcosdias.miniifood.product.domain.Product;
 import com.marcosdias.miniifood.product.repository.ProductRepository;
+import com.marcosdias.miniifood.product.web.ProductMapper;
 import com.marcosdias.miniifood.product.web.dto.ProductPageResponse;
-import com.marcosdias.miniifood.product.web.dto.ProductResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     @Transactional(readOnly = true)
@@ -31,7 +33,7 @@ public class ProductService {
         Page<Product> page = productRepository.findAll(pageable);
 
         return new ProductPageResponse(
-            page.getContent().stream().map(this::toResponse).toList(),
+            page.getContent().stream().map(productMapper::toResponse).toList(),
             page.getNumber(),
             page.getSize(),
             page.getTotalElements(),
@@ -89,18 +91,6 @@ public class ProductService {
         Product product = findById(id);
         productRepository.delete(product);
         log.info("Product deleted: {}", id);
-    }
-
-    private ProductResponse toResponse(Product product) {
-        return new ProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.getPrice(),
-            product.getQuantityAvailable(),
-            product.getCreatedAt(),
-            product.getUpdatedAt()
-        );
     }
 }
 

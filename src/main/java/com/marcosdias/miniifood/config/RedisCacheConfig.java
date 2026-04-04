@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -27,20 +27,16 @@ public class RedisCacheConfig {
     private static final long CACHE_TTL_MINUTES = 60;
 
     @Bean
-    public Jackson2JsonRedisSerializer<ProductPageResponse> redisSerializer() {
+    public RedisSerializer<ProductPageResponse> redisSerializer() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        Jackson2JsonRedisSerializer<ProductPageResponse> serializer =
-            new Jackson2JsonRedisSerializer<>(objectMapper, ProductPageResponse.class);
-        serializer.setObjectMapper(objectMapper);
-        return serializer;
+        return new ProductPageRedisSerializer(objectMapper);
     }
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
-                                     Jackson2JsonRedisSerializer<ProductPageResponse> redisSerializer) {
+                                     RedisSerializer<ProductPageResponse> redisSerializer) {
         log.info("Configuring Redis Cache with TTL: {} minutes", CACHE_TTL_MINUTES);
         
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()

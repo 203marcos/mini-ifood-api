@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.marcosdias.miniifood.product.domain.Product;
 import com.marcosdias.miniifood.product.repository.ProductRepository;
+import com.marcosdias.miniifood.product.web.ProductMapper;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private ProductMapper productMapper;
 
     @InjectMocks
     private ProductService productService;

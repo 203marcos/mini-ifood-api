@@ -7,6 +7,7 @@ import static org.mockito.Mockito.reset;
 
 import com.marcosdias.miniifood.product.domain.Product;
 import com.marcosdias.miniifood.product.repository.ProductRepository;
+import com.marcosdias.miniifood.product.web.dto.ProductPageResponse;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
@@ -60,11 +60,11 @@ class ProductServiceCacheIntegrationTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Product> firstCall = productService.findAll(pageable);
-        Page<Product> secondCall = productService.findAll(pageable);
+        ProductPageResponse firstCall = productService.findAll(pageable);
+        ProductPageResponse secondCall = productService.findAll(pageable);
 
-        assertThat(firstCall).hasSize(1);
-        assertThat(secondCall).hasSize(1);
+        assertThat(firstCall.content()).hasSize(1);
+        assertThat(secondCall.content()).hasSize(1);
         verify(productRepository, times(1)).findAll(pageable);
     }
 }
